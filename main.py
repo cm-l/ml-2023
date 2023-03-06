@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import sklearn.model_selection
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 import math
@@ -82,4 +83,9 @@ for i in df[col_float]:
 
 # Eksport
 df.to_csv('normalizedtrain.csv')
+
+# Train/Test split
+traintest = sklearn.model_selection.train_test_split(df, shuffle=False)
+print("Train/Test Split:")
+print(traintest)
 
