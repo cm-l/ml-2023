@@ -74,9 +74,9 @@ df.to_csv('convertedtrain.csv')
 # Standaryzacja/normalizacja danych
 scaler = MinMaxScaler()
 col_float = ['Age', 'Annual_Income',
-'Delay_from_due_date', 'Num_of_Delayed_Payment',
-'Outstanding_Debt',
-'Total_EMI_per_month', 'Monthly_Balance']
+             'Delay_from_due_date', 'Num_of_Delayed_Payment',
+             'Outstanding_Debt',
+             'Total_EMI_per_month', 'Monthly_Balance']
 
 for i in df[col_float]:
     df[i] = scaler.fit_transform(df[[i]])
@@ -88,4 +88,3 @@ df.to_csv('normalizedtrain.csv')
 traintest = sklearn.model_selection.train_test_split(df, shuffle=False)
 print("Train/Test Split:")
 print(traintest)
-
