@@ -1,90 +1,91 @@
-import colored as colored
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import sklearn.model_selection
 from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import OneHotEncoder
 import math
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.model_selection import train_test_split
 
-# 1. Zaczytaj dane
-# 2. Sprawdź wymiary
-# 3. Usuń duplikaty
-# 4. Zmień typ danych
-# 5. Uzupełnij/ usuń braki
-# 6. Zmień dane kategoryczne na numeryczne
-# 7. Znormalizuj dane
-# 8. Podziel zbiór na uczący i testowy
-
-# Wczytywanie
-# 1. zaczytaj dane z pliku csv
-df = pd.read_csv("train.csv", sep=",", encoding='utf-8')
-# 2. sprawdź liczbę kolumn i wierszy (columns, entries)
-print("Info:")
-df.info()
+# zaczytanie danych z pliku
+df_train = pd.read_csv("train.csv", sep=",", encoding='utf-8')
+# sprawdzenie rozmiaru
+print(df_train.shape)
+# sprawdzenie nazw kolumn i ich typów
+print(df_train.info())
 # wyświetl część tabeli
-print("Nagłówek (początkowy):")
-print(df.head())
-# 3. usuń wiersze z duplikatami id
-df.drop_duplicates(subset="ID", inplace=True)
+df_train.head()
+# usunięcie wierszy z duplikatami id
+df_train.drop_duplicates(subset="ID", inplace=True)
 
-# 4. zamiana danych
-FeaturesToConvert = ['Age', 'Annual_Income',
-                     'Num_of_Loan', 'Num_of_Delayed_Payment',
-                     'Changed_Credit_Limit', 'Outstanding_Debt',
-                     'Amount_invested_monthly', 'Monthly_Balance']
-# Usuwanie błędów
+# nazwy kolumn dla danych docelowo numerycznych
+FeaturesToConvert = ['Age', 'Annual_Income', 'Num_of_Loan', 'Num_of_Delayed_Payment',
+                     'Changed_Credit_Limit', 'Outstanding_Debt', 'Amount_invested_monthly',
+                     'Monthly_Balance']
+
+# nazwy kolumn dla danych kategorycznych
+
+# liczności danych kategorii
+sns.countplot(df_train['Credit_Score'])
+
+# sprawdzenie danych
+for i in df_train.columns:
+    print(df_train[i].value_counts())
+    print('*' * 50)
+
+# wyświetl liczbę pustych wartosci
+print(df_train.isnull().sum().sort_values(ascending=False))
+
+########## dane numeryczne #########################
+# usuń zbędne znaki '-’ , '_'
 for feature in FeaturesToConvert:
-    uniques = df[feature].unique()
+    df_train[feature] = df_train[feature].str.strip('-_')
+# puste kolumny zastąp NAN
+for feature in FeaturesToConvert:
+    df_train[feature] = df_train[feature].replace({'': np.nan})
+# zmien typ zmiennych ilościowych
+for feature in FeaturesToConvert:
+    df_train[feature] = df_train[feature].astype('float64')
 
-    # Usuwanie zbędnych znaków
-    df[feature] = df[feature].str.strip('-_')
+# uzupełnij braki średnią
+df_train['Monthly_Inhand_Salary'] = df_train['Monthly_Inhand_Salary'].fillna(method='pad')
+df_train['Monthly_Balance'] = df_train['Monthly_Inhand_Salary'].fillna(method='pad')
+df_train['Type_of_Loan'] = df_train['Type_of_Loan'].fillna(method='ffill')
+df_train['Credit_History_Age'] = df_train['Type_of_Loan'].fillna(method='pad')
+df_train['Num_of_Delayed_Payment'] = df_train['Num_of_Delayed_Payment'].fillna(method='pad')
+df_train['Amount_invested_monthly'] = df_train['Amount_invested_monthly'].fillna(method='pad')
+df_train['Changed_Credit_Limit'] = df_train['Changed_Credit_Limit'].fillna(method='pad')
+df_train['Num_Credit_Inquiries'] = df_train['Num_Credit_Inquiries'].fillna(method='pad')
 
-    # NaN w pustych kolumnach
-    df[feature] = df[feature].replace({'': np.nan})
+print(df_train.isnull().sum().sort_values(ascending=False))
 
-    # Typ danych
-    df[feature] = df[feature].astype('float64')
+# zastąpienie nierealnych wartości medianą
+for i in df_train.Age.values:
+    if (i > 118 or i < 0):
+        df_train.Age.replace(i, np.median(df_train.Age), inplace=True)
 
-# Uzupełnienie braku śedniej
-df['Monthly_Inhand_Salary'] = df['Monthly_Inhand_Salary'].fillna(method='pad')
-
-# Dane kategoryczne na numeryczne
-# oprócz occupation trzeba też: credit_mix, payment_of_min_amount, payment_bhvr
-# Pojedynczo
+############ zmienne kategoryczne #####################
+# stwórz obiekt enkodera
 le = LabelEncoder()
-df.Occupation = le.fit_transform(df.Occupation)
-print(df.Occupation)  # widzę liczby - działa
-# Albo razem
-columns = ['Credit_Mix', 'Payment_of_Min_Amount', 'Payment_Behaviour', 'Type_of_Loan', 'Credit_Score']
-df[columns] = df[columns].apply(le.fit_transform)
-print(df.Payment_Behaviour)  # też działa
 
-# Zamiana dat
-# print(df['Credit_History_Age'].head)
-# ohe = OneHotEncoder(handle_unknown='ignore')
-# ohe.fit(df.Credit_History_Age)
+CatFeatures = ['Occupation', 'Credit_Mix', 'Payment_of_Min_Amount',
+               'Payment_Behaviour', 'Credit_Score']
 
-# Eksport
-df.to_csv('convertedtrain.csv')
+# zakoduj etykiety słowne numerycznymi
 
-# Standaryzacja/normalizacja danych
-scaler = MinMaxScaler()
-col_float = ['Age', 'Annual_Income',
-             'Delay_from_due_date', 'Num_of_Delayed_Payment',
-             'Outstanding_Debt',
-             'Total_EMI_per_month', 'Monthly_Balance']
+df_train[CatFeatures] = df_train[CatFeatures].apply(LabelEncoder().fit_transform)
 
-for i in df[col_float]:
-    df[i] = scaler.fit_transform(df[[i]])
+# usuń nieistotne kolumny
+irrelevant = ['ID', 'Customer_ID', 'Name', 'SSN']
+df_train = df_train.drop(irrelevant, axis=1)
 
-# Eksport
-df.to_csv('normalizedtrain.csv')
+#######################################################
+# sprawdź transformacje
+print(df_train.shape)
+print('\n**********************************\n')
+print(df_train.info())
+print('\n**********************************\n')
+print(df_train.describe().transpose())
+print('\n**********************************\n')
+######################################################
 
-# Train/Test split
-traintest = sklearn.model_selection.train_test_split(df, shuffle=False)
-print("Train/Test Split:")
-print(traintest)
