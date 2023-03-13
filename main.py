@@ -121,6 +121,9 @@ plt.show()
 pd.DataFrame(abs(df_train.corr()['Credit_Score'].drop('Credit_Score') * 100).sort_values(ascending=False)).plot.bar(
     figsize=(10, 8))
 plt.show()
+# Usuwamy EMI per month i total inquiries
+df_train.drop(df_train['Total_EMI_per_month'])
+df_train.drop(df_train['Num_Credit_Inquiries'])
 
 #######################################################
 # sprawdź transformacje
