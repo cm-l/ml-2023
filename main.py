@@ -117,6 +117,11 @@ sns.heatmap(df_train[lista].corr(), annot=True, linewidths=0.1, cmap='Blues')
 plt.title('Numerical Features Correlation')
 plt.show()
 
+# ranking cech korelacji
+pd.DataFrame(abs(df_train.corr()['Credit_Score'].drop('Credit_Score') * 100).sort_values(ascending=False)).plot.bar(
+    figsize=(10, 8))
+plt.show()
+
 #######################################################
 # sprawdź transformacje
 print(df_train.shape)
