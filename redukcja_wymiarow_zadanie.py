@@ -48,7 +48,23 @@ mp_plot = ConfusionMatrixDisplay(mp, display_labels=logreg.classes_).plot() # wy
 mp_plot.plot()
 plt.show()
 
+
 cr = classification_report(Y_test, predicted) # raport
+
+# Ręczne liczenie dla label 1:
+tp1 = 1916
+tn1 = 7501
+fp1 = 1433
+fn1 = 3148
 
 print(cr)
 
+print("\n Pokrywa się z raportem :)")
+recall1 = tp1 / (tp1 + fn1)
+print(f"Recall: {recall1}")
+prec1 = tp1 / (tp1 + fp1)
+print(f"Precision: {prec1}")
+fscore1 = 2*((prec1 * recall1) / (prec1 + recall1))
+print(f"F1-Score: {fscore1}")
+accuracy1 = (tp1 + tn1 + 361) / len(predicted)
+print(f"Accuracy: {accuracy1}")
