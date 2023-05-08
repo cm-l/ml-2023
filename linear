@@ -1,0 +1,60 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn import datasets, linear_model
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import LabelEncoder
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+
+df = pd.read_csv("Salary Data.csv", sep = "," , encoding= 'utf-8')
+# stwórz obiekt enkodera
+le = LabelEncoder()
+
+CatFeatures = ['Gender','Education Level','Job Title']
+
+# zakoduj etykiety słowne numerycznymi
+
+df[CatFeatures] = df[CatFeatures].apply(LabelEncoder().fit_transform)
+
+
+
+X=df.loc[:,['Age','Gender','Education Level','Job Title','Years of Experience']]
+Y=df.loc[:,['Salary']]
+
+X_train, X_test, Y_train, Y_test = train_test_split(X,Y,random_state=100)
+
+regr = linear_model.LinearRegression()
+
+regr.fit(X_train, Y_train)
+
+Y_pred = regr.predict(X_test)
+
+# The coefficients
+print("Coefficients: \n", regr.coef_)
+# The mean squared error
+print("Mean squared error: %.2f" % mean_squared_error(Y_test, Y_pred))
+# The coefficient of determination: 1 is perfect prediction
+print("Coefficient of determination: %.2f" % r2_score(Y_test, Y_pred))
+
+print(len(X_test))
+print(len(X_train))
+print(len(Y_test))
+print(len(Y_pred))
+print(len(Y_train))
+
+print(type(X_test))
+
+print(X_test.shape)
+
+print(Y_test.shape)
+
+# Plot outputs
+plt.scatter(X_test["Age"], Y_test, color="black")
+#plt.plot(X_test["Age"], Y_pred, color="blue", linewidth=3)
+
+plt.xticks(())
+plt.yticks(())
+
+plt.show()
