@@ -81,9 +81,20 @@ linkage_matrix = linkage(scaled_data, method='ward')
 
 # Plot the dendrogram
 plt.figure(figsize=(10, 6))
-dendrogram(linkage_matrix, truncate_mode="level", labels=cluster_labels, color_threshold=k, p=k)
+dendrogram(linkage_matrix, truncate_mode="level", labels=cluster_labels, color_threshold=k)
 plt.title('Plot Hierarchical Clustering Dendrogram')
 plt.xlabel('Cluster')
+plt.ylabel('Odległość (euklidesowa)')
+plt.tight_layout()
+
+# zawartosc
+plt.show()
+
+# Plot the dendrogram 2.0 redux
+plt.figure(figsize=(10, 6))
+dendrogram(linkage_matrix, truncate_mode="level", labels=cluster_labels, color_threshold=3, p=k)
+plt.title('Plot Hierarchical Clustering Dendrogram (wersja 1:1 z dokumentacji)')
+plt.xlabel('Number of points in node (or index if no ())')
 plt.ylabel('Odległość (euklidesowa)')
 plt.tight_layout()
 
