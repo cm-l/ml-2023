@@ -71,5 +71,6 @@ X_test_scaling = scale.fit_transform(X_test)
 neigh = KNeighborsRegressor(n_neighbors=3)
 neigh.fit(X_train_scaling, Y_train)
 neigh.predict(X_test_scaling)
-# The coefficients dla knn
+# R^2 dla knn
 print("Coefficient of determination for KNN: \n", neigh.score(X_test_scaling, Y_test))
+
