@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.datasets import make_blobs
 from sklearn.preprocessing import StandardScaler
-from yellowbrick.cluster import KElbowVisualizer
+from sklearn.metrics import silhouette_samples, silhouette_score
 
 # 1. Przetwarzanie danych
 # Read countries
@@ -46,3 +46,14 @@ cluster_labels = kmeans.labels_
 # Add cluster labels to the original data
 df['Cluster'] = cluster_labels
 
+# Podsumowanie wykonanej analizy
+for cluster in range(k):
+    cluster_data = df[df['Cluster'] == cluster]
+    cluster_size = len(cluster_data)
+    cluster_center = kmeans.cluster_centers_[cluster]
+    print(f"-- Cluster {cluster+1} --\n")
+    print(f"Ile krajów?: {cluster_size}")
+    print(f"Centroid: {cluster_center}")
+    print("5 pierwszych krajów:")
+    print(cluster_data.head())
+    print("\n----------------------------\n")
