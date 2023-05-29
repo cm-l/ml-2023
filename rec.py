@@ -27,7 +27,7 @@ df_encoded = pd.DataFrame(encoded_data, columns=encoder.columns_)
 print(df_encoded.head())
 
 # Find frequent itemsets using Apriori algorithm
-frequent_itemsets = apriori(df_encoded, min_support=0.05, use_colnames=True)
+frequent_itemsets = apriori(df_encoded, min_support=0.2, use_colnames=True, verbose=1)
 
 # Generate association rules
 rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.5)
